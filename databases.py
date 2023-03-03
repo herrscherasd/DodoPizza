@@ -8,10 +8,10 @@ class DataBaseCustomers:
         cursor = self.connect.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS customers (
         first_name VARCHAR(255),
-        last_name VARVHAR(255),
+        last_name VARCHAR(255),
         username VARCHAR(255),
         user_id INTEGER,
-        phone_number INTEGER
+        phone_number DEFAULT 0
         );""")
 
         cursor.execute("""CREATE TABLE IF NOT EXISTS address (

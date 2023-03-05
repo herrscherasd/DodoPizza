@@ -23,15 +23,15 @@ async def start(message:types.Message):
     cursor.execute(f'SELECT user_id FROM customers WHERE user_id = {message.from_user.id};')
     result = cursor.fetchall()
     if result == []:
-        cursor.execute(f"INSERT INTO customers VALUES ('{message.from_user.first_name}', '{message.from_user.last_name}', '{message.from_user.username}', '{message.from_user.id}');")
+        cursor.execute(f"INSERT INTO customers VALUES ('{message.from_user.first_name}', '{message.from_user.last_name}', '{message.from_user.username}', '{message.from_user.id}', 'None');")
     connect.commit()
 
-# @dp.callback_query_handler(lambda call : call)
-# async def inline(call):
-#     if call.data == 'send_number':
-#         await get_number(call.message)
-#     elif call.data == 'send_location':
-#         await get_location(call.message)
+@dp.callback_query_handler(lambda call : call)
+async def inline(call):
+    if call.data == 'send_number':
+        await get_number(call.message)
+    elif call.data == 'send_location':
+        await get_location(call.message)
 
 @dp.message_handler(commands='number')
 async def get_number(message:types.Message):
@@ -40,7 +40,7 @@ async def get_number(message:types.Message):
 @dp.message_handler(content_types=types.ContentType.CONTACT)
 async def add_number(message:types.Message):
     cursor = connect.cursor()
-    cursor.execute(f"UPDATE customers SET phone_number = '{message.contact['phone_number']}' WHERE user_id = {message.from_user.from_id};")
+    cursor.execute(f"UPDATE customers SET phone_number = '{message.contact['phone_number']}' WHERE user_id = {message.from_user.id};")
     connect.commit()
     await message.answer("Ваш номер успешно добавлен.")
 
@@ -50,8 +50,10 @@ async def get_location(message:types.Message):
 
 @dp.message_handler(content_types=types.ContentType.LOCATION)
 async def add_location(message:types.Message):
+    await message.answer("Ваш адрес записан.")
     cursor = connect.cursor()
-    cursor.execute(f"INSERT INTO address VALUES ('{message.from_user.id}', '{message.location})")
+    cursor.execute(f"INSERT INTO address VALUES ('{message.from_user.id}', '{message.location.longitude}', '{message.location.latitude}');")
+    connect.commit()
 
 
 

@@ -11,7 +11,7 @@ class DataBaseCustomers:
         last_name VARCHAR(255),
         username VARCHAR(255),
         user_id INTEGER,
-        phone_number DEFAULT 0
+        phone_number INTEGER DEFAULT 0
         );""")
 
         cursor.execute("""CREATE TABLE IF NOT EXISTS address (

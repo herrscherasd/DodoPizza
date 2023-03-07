@@ -2,7 +2,7 @@ import sqlite3
 
 class DataBaseCustomers:
     def __init__(self):
-        self.connect = sqlite3.connect('customers.db')
+        self.connect = sqlite3.connect('DodoBase.db')
 
     def connect_db(self):
         cursor = self.connect.cursor()

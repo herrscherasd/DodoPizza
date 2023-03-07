@@ -8,12 +8,12 @@ inline_buttons = [
 button = InlineKeyboardMarkup().add(*inline_buttons)
 
 number_button = [
-    KeyboardButton('Подтвердить отправку номера.', request_contact=True)
+    KeyboardButton('Подтвердить отправку номера.', request_contact=True, )
 ]
 
 location_button = [
     KeyboardButton('Подтвердить отправку местоположения.', request_location=True)
 ]
 
-num_button = ReplyKeyboardMarkup().add(*number_button)
-loc_button = ReplyKeyboardMarkup().add(*location_button)
+num_button = ReplyKeyboardMarkup(resize_keyboard=True).add(*number_button)
+loc_button = ReplyKeyboardMarkup(resize_keyboard=True).add(*location_button)

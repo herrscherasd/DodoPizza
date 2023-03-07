@@ -15,14 +15,15 @@ class DataBaseCustomers:
         );""")
 
         cursor.execute("""CREATE TABLE IF NOT EXISTS address (
-        user_id INTEGER,
+        id_user INTEGER,
         address_longtitude INTEGER,
         address_latitude INTEGER
         );""")
 
         cursor.execute("""CREATE TABLE IF NOT EXISTS orders (
+        user_id INTEGER,
         title VARCHAR(255),
-        address_destination VARCHAR(255),
+        address_destination INTEGER(255),
         date_time_order VARCHAR(120)
         );""")
 

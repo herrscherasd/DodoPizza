@@ -4,12 +4,14 @@ import logging
 import time
 import os
 
-from buttons import button, loc_button, num_button
+from buttons import loc_button, num_button, inline_button1, inline_button2, inline_button3
 from databases import DataBaseCustomers
 
 db = DataBaseCustomers()
 connect = db.connect
 db.connect_db()
+
+
 
 load_dotenv('.env')
 
@@ -20,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 @dp.message_handler(commands='start')
 async def start(message:types.Message):
     await message.answer(f'Здравствуйте, {message.from_user.full_name}')
-    await message.answer("В этом боте вы можете оставить свой заказ на пиццу.\n\nНо не забывайте оставить ваш адрес и контактный номер!!!", reply_markup=button)
+    await message.answer("В этом боте вы можете оставить свой заказ на пиццу.\n\nНо не забывайте оставить ваш адрес и контактный номер!!!", reply_markup=inline_button1)
     cursor = connect.cursor()
     cursor.execute(f'SELECT user_id FROM customers WHERE user_id = {message.from_user.id};')
     result = cursor.fetchall()
@@ -46,7 +48,7 @@ async def add_number(message:types.Message):
     cursor = connect.cursor()
     cursor.execute(f"UPDATE customers SET phone_number = '{message.contact['phone_number']}' WHERE user_id = {message.from_user.id};")
     connect.commit()
-    await message.answer("Ваш номер успешно добавлен.")
+    await message.answer("Ваш номер успешно добавлен.",reply_markup=inline_button3)
 
 @dp.message_handler(commands='location')
 async def get_location(message:types.Message):
@@ -54,10 +56,12 @@ async def get_location(message:types.Message):
 
 @dp.message_handler(content_types=types.ContentType.LOCATION)
 async def add_location(message:types.Message):
-    await message.answer("Ваш адрес записан.")
+    address = f"{message.location.longitude}, {message.location.latitude}"
     cursor = connect.cursor()
     cursor.execute(f"INSERT INTO address VALUES ('{message.from_user.id}', '{message.location.longitude}', '{message.location.latitude}');")
+    cursor.execute(f"UPDATE orders SET address_destination ='{address}';")
     connect.commit()
+    await message.answer("Ваш адрес успешно записан", reply_markup=types.ReplyKeyboardRemove())
 
 @dp.message_handler(commands='order')
 async def get_order(message:types.Message):
@@ -80,20 +84,22 @@ async def get_order(message:types.Message):
 
     await message.answer("Введите номер из меню и мы запишем ваш заказ.")
 
+
+
 @dp.message_handler(text=[1,2,3,4,5])
 async def add_order(message:types.Message):
     cursor = connect.cursor()
     if message.text == '1':
-        cursor.execute(f"INSERT INTO orders VALUES('Пицца-сказка', 'None', '{time.ctime()}');")
-    if message.text == '2':
-        cursor.execute(f"INSERT INTO orders VALUES('Пепперони-сердце', 'None', '{time.ctime()}');")
-    if message.text == '3':
-        cursor.execute(f"INSERT INTO orders VALUES('Четыре сыра', 'None', '{time.ctime()}');")
-    if message.text == '4':
-        cursor.execute(f"INSERT INTO orders VALUES('Додоко', 'None', '{time.ctime()}');")
-    if message.text == '5':
-        cursor.execute(f"INSERT INTO orders VALUES('Четыре сезона', 'None', '{time.ctime()}');")
+        cursor.execute(f"INSERT INTO orders VALUES('{message.from_user.id}', 'Пицца-сказка', '' , '{time.ctime()}');")
+    elif message.text == '2':
+        cursor.execute(f"INSERT INTO orders VALUES('{message.from_user.id}', 'Пепперони-сердце', '', '{time.ctime()}');")
+    elif message.text == '3':
+        cursor.execute(f"INSERT INTO orders VALUES('{message.from_user.id}', 'Четыре сыра', '', '{time.ctime()}');")
+    elif message.text == '4':
+        cursor.execute(f"INSERT INTO orders VALUES('{message.from_user.id}', 'Додоко', '', '{time.ctime()}');")
+    elif message.text == '5':
+        cursor.execute(f"INSERT INTO orders VALUES('{message.from_user.id}', 'Четыре сезона', '', '{time.ctime()}');")
     connect.commit()
-    await message.reply("Ваш заказ записан")
+    await message.reply("Ваш заказ записан. Укажите адрес",reply_markup=inline_button2)
 
 executor.start_polling(dp)
